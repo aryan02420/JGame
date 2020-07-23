@@ -36,16 +36,7 @@ function setup() {
   let cnv = createCanvas(400, 400);                                              // create canvas
   cnv.parent(canvasParent);
   noStroke();
-  playername.html(`<span style="color: ${(player=='r'?'#B4395E':'#4D7D1E')}">
-    ${(player=='r'?'PlayerOne':'PlayerTwo')}
-  </span>`);                                                                     // modify DOM
-  if (firstMove) {
-    ins1.show();
-    ins2.hide();
-  } else {
-    ins1.hide();
-    ins2.show();
-  }
+  updateDOM();
 }
 
 function draw() {
@@ -93,6 +84,7 @@ function mouseReleased() {
         grid[coord[0]][coord[1]] = player;                                       // draw new boxes
       }
       firstMove = false;                                                         // make it second move
+      updateDOM();
     }
   } else if (getBox(mouseX, mouseY)!=false) {                                    // if second move and click inside canvas
     const cords = getBox(mouseX, mouseY);
@@ -101,7 +93,8 @@ function mouseReleased() {
       if (/^n/.test(val)) {                                                      // if neutral box
         grid[cords[0]][cords[1]] += 'd';                                         // select it
         selected = cords;
-        return false;                                                            // refer comment on Line 127
+        updateDOM();
+        return false;                                                            // refer comment on Line 115
       }
     } else {                                                                     // if neutral piece selected
       if (/^e/.test(val) || JSON.stringify(cords)==JSON.stringify(selected)) {   // if empty space or same position
@@ -114,19 +107,10 @@ function mouseReleased() {
           player='r';
         }
         firstMove = true;                                                        // make it first move
-        return false;                                                            // refer comment on Line 127
+        updateDOM();
+        return false;                                                            // refer comment on Line 115
       }
     }
-  }
-  playername.html(`<span style="color: ${(player=='r'?'#B4395E':'#4D7D1E')}">
-    ${(player=='r'?'PlayerOne':'PlayerTwo')}
-  </span>`);                                                                     // modify DOM
-  if (firstMove) {
-    ins1.show();
-    ins2.hide();
-  } else {
-    ins1.hide();
-    ins2.show();
   }
   // return false;                                                               // FIXED
                                                                                  // return false = event.preventDefault
@@ -185,6 +169,19 @@ function drawBox(_value, _x, _y) {                                              
     fill(155, 187, 233, 100);
     rect(_x * 100 + 2, _y * 100 + 2, 96, 96);                                    // draw highlight
     noStroke();
+  }
+}
+
+function updateDOM() {                                                           // modify DOM
+  playername.html(`<span style="color: ${(player=='r'?'#B4395E':'#4D7D1E')}">
+    ${(player=='r'?'PlayerOne':'PlayerTwo')}
+  </span>`);
+  if (firstMove) {
+    ins1.show();
+    ins2.hide();
+  } else {
+    ins1.hide();
+    ins2.show();
   }
 }
 
