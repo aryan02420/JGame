@@ -3,12 +3,17 @@ html, body {
   padding: 0;
   width: 100%;
   max-width: 600px;
+  overscroll-behavior-y: contain;
 }
 body>* {
-  margin: 1rem auto;
+  margin: 1rem;
   text-align: center;
 }
 canvas {
   display: block;
-  margin: auto;
+  margin: 1rem auto;
+  touch-action: none;
+  width: 100% !important;
+  height: auto !important;
+  max-width: 600px;
 }

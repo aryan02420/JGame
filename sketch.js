@@ -36,7 +36,9 @@ function setup() {
   let cnv = createCanvas(400, 400);                                              // create canvas
   cnv.parent(canvasParent);
   noStroke();
-  playername.html(`<span style="color:${(player=='r'?'#B4395E':'#4D7D1E')}">${(player=='r'?'PlayerOne':'PlayerTwo')}</span>`);                                                  // modify DOM
+  playername.html(`<span style="color: ${(player=='r'?'#B4395E':'#4D7D1E')}">
+    ${(player=='r'?'PlayerOne':'PlayerTwo')}
+  </span>`);                                                                     // modify DOM
   if (firstMove) {
     ins1.show();
     ins2.hide();
@@ -63,6 +65,9 @@ function mouseDragged() {
       grid[cords[0]][cords[1]] += 'd';                                           // mark as drawn
     }
   }
+  // return false;                                                               // return false = event.preventDefault
+                                                                                 // do not use this since it disables scrolling on touch devices
+                                                                                 // instead use css touch-ation: none on canvas element
 }
 
 function mouseReleased() {
@@ -94,8 +99,9 @@ function mouseReleased() {
     const val = grid[cords[0]][cords[1]];
     if (!selected) {                                                             // if no neutral piece selected
       if (/^n/.test(val)) {                                                      // if neutral box
-        grid[cords[0]][cords[1]] += 'd';                                         // select it                                           
+        grid[cords[0]][cords[1]] += 'd';                                         // select it
         selected = cords;
+        return false;                                                            // refer comment on Line 127
       }
     } else {                                                                     // if neutral piece selected
       if (/^e/.test(val) || JSON.stringify(cords)==JSON.stringify(selected)) {   // if empty space or same position
@@ -108,10 +114,13 @@ function mouseReleased() {
           player='r';
         }
         firstMove = true;                                                        // make it first move
+        return false;                                                            // refer comment on Line 127
       }
     }
   }
-  playername.html(`<span style="color:${(player=='r'?'#B4395E':'#4D7D1E')}">${(player=='r'?'PlayerOne':'PlayerTwo')}</span>`);                                                  // modify DOM
+  playername.html(`<span style="color: ${(player=='r'?'#B4395E':'#4D7D1E')}">
+    ${(player=='r'?'PlayerOne':'PlayerTwo')}
+  </span>`);                                                                     // modify DOM
   if (firstMove) {
     ins1.show();
     ins2.hide();
@@ -119,6 +128,12 @@ function mouseReleased() {
     ins1.hide();
     ins2.show();
   }
+  // return false;                                                               // FIXED
+                                                                                 // return false = event.preventDefault
+                                                                                 // disables clickrelease event globally
+                                                                                 // without it, touch on mobile behaves weirdly
+                                                                                 // moved it inside if statements
+                                                                                 // so it only prevents default when on canvas
 }
 
 function isValid(drawn, current) {
@@ -151,8 +166,8 @@ function getBox(_x, _y) {                                                       
   const xpos = Math.floor(_x / 100);
   const ypos = Math.floor(_y / 100);
   if (xpos!=xpos.clamp(0,3)) return false;
-  if (ypos!=ypos.clamp(0,3)) return false;  
-  return [ypos, xpos];   
+  if (ypos!=ypos.clamp(0,3)) return false;
+  return [ypos, xpos];
 }
 
 function drawBox(_value, _x, _y) {                                               // draws a box
@@ -168,7 +183,7 @@ function drawBox(_value, _x, _y) {                                              
     stroke(	59, 121, 212, 100);
     strokeWeight(3);
     fill(155, 187, 233, 100);
-    rect(_x * 100 + 2, _y * 100 + 2, 96, 96);                                    // draw highlight  
+    rect(_x * 100 + 2, _y * 100 + 2, 96, 96);                                    // draw highlight
     noStroke();
   }
 }
@@ -179,5 +194,3 @@ function drawBox(_value, _x, _y) {                                              
 // [ ] End Detection
 // [ ] Undo
 // [ ] socket.io multiplayer
- 
-
