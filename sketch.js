@@ -19,22 +19,31 @@ const correctMoves = [                                                          
 let selected = false;                                                            // coordinates of selected neutral piece or false if none selected
 
 let imgE, imgN, imgR, imgB;                                                      // images
-let playername, ins1, ins2, canvasParent;                                        // DOM elements
+let playername, ins1, ins2, moves, canvasParent;                                        // DOM elements
 
 function preload() {                                                             // load images before canvas loads
   imgE = loadImage('images/board.png');
   imgN = loadImage('images/buttonN.png');
   imgR = loadImage('images/buttonR.png');
   imgB = loadImage('images/buttonB.png');
-  playername = select('#playername');                                            // get elements
+  playername = select('#playername');                                          // get DOM elements
   ins1 = select('#ins1');
   ins2 = select('#ins2');
+  moves = select('#moves');
   canvasParent = select('#canvas');
 }
 
 function setup() {
   let cnv = createCanvas(400, 400);                                              // create canvas
   cnv.parent(canvasParent);
+  grid = [                                                                       // game state
+    ['e', 'b', 'b', 'n'],                                                        // must start with r|b|e|n
+    ['e', 'b', 'r', 'e'],                                                        // may end with d
+    ['e', 'b', 'r', 'e'],
+    ['n', 'r', 'r', 'e']
+  ];
+  player = 'r';                                                                  // current player (r|b)
+  firstMove = true;
   noStroke();
   updateDOM();
 }
@@ -142,15 +151,11 @@ function loopOver(_func) {                                                      
   }
 }
 
-Number.prototype.clamp = function(min, max) {                                    // constraint a number between min and max
-  return Math.min(Math.max(this, min), max);
-};
-
 function getBox(_x, _y) {                                                        // returns the box mouse is currently on
   const xpos = Math.floor(_x / 100);
   const ypos = Math.floor(_y / 100);
-  if (xpos!=xpos.clamp(0,3)) return false;
-  if (ypos!=ypos.clamp(0,3)) return false;
+  if (xpos < 0 || xpos > 3) return false;                                        // or false if mouse is outside
+  if (ypos < 0 || ypos > 3) return false;
   return [ypos, xpos];
 }
 
@@ -173,21 +178,54 @@ function drawBox(_value, _x, _y) {                                              
 }
 
 function updateDOM() {                                                           // modify DOM
-  playername.html(`<span style="color: ${(player=='r'?'#B4395E':'#4D7D1E')}">
+  playername.html(`Its <span style="color: ${(player=='r'?'#B4395E':'#4D7D1E')}">
     ${(player=='r'?'PlayerOne':'PlayerTwo')}
-  </span>`);
+  </span>'s turn.`);
   if (firstMove) {
     ins1.show();
     ins2.hide();
+    moves.show();
+    const m = checkMoves();                                                      // when a players turn, show him no. of possible moves
+    if (m == 0) {                                                                // if no moves left
+      playername.html(`<span style="color: ${(player=='b'?'#B4395E':'#4D7D1E')}">
+        ${(player=='b'?'PlayerOne':'PlayerTwo')}
+      </span> wins!`);                                                           // player whose turn is over wins
+    } else {
+      moves.html(`${m} possible moves`);
+    }
   } else {
     ins1.hide();
     ins2.show();
+    moves.hide();
   }
+}
+
+function checkMoves() {
+  let possibleMoves = 0;
+  const re = new RegExp(`^${player}|^e`, '');
+  for (const pos of correctMoves) {                                              // start with basic normalized positions
+    for (let i = 0; i < 3; i++) {                                                // offset in y direction
+      for (let j = 0; j < 3; j++) {                                              // offset in x direction
+        try {                                                                    // inside try-catch bacause horizontal and vertical orientations have different max offset (either 3 or 2)
+          if (re.test(grid[ parseInt(pos.substring(0,1)) + i ][ parseInt(pos.substring(4,5)) + j ]) &&
+              re.test(grid[ parseInt(pos.substring(1,2)) + i ][ parseInt(pos.substring(5,6)) + j ]) &&
+              re.test(grid[ parseInt(pos.substring(2,3)) + i ][ parseInt(pos.substring(6,7)) + j ]) &&
+              re.test(grid[ parseInt(pos.substring(3,4)) + i ][ parseInt(pos.substring(7,8)) + j ]) ) {
+                  possibleMoves+=1;                                              // if empty or same colred box add 1 to pssible movevs
+          }
+        } catch {
+
+        }
+      }
+    }
+  }
+  return possibleMoves-1;                                                        // subtract 1 because possible moves must not include current position
 }
 
 
 
 // TODO
-// [ ] End Detection
+// [x] End Detection
+// [x] Replay button
 // [ ] Undo
 // [ ] socket.io multiplayer

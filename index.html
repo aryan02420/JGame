@@ -10,10 +10,11 @@
 </head>
 
 <body>
-
-  <p>Its <span id="playername"></span>'s turn.</p>
+  <button onclick="setup();">Restart</button>
+  <p id="playername"></p>
   <p><span id="ins1">Move your colored pieces</span><span id="ins2">Move a neutral piece</span></p>
   <div id="canvas"></div>
+  <p id="moves"></p>
   <p>On each turn, a player must first move their L piece, and then may optionally move one of the neutral pieces. The game is won by leaving the opponent unable to move their L piece to a new position.</p>
   <p>Pieces may not overlap or cover other pieces. On moving the L piece, it is picked up and then placed in empty squares anywhere on the board. It may be rotated or even flipped over in doing so; the only rule is that it must end in a different
     position from the position it started—thus covering at least one square it did not previously cover. To move a neutral piece, a player simply picks it up then places it in an empty square anywhere on the board.</p>
