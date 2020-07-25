@@ -188,6 +188,8 @@ function updateDOM() {                                                          
     const m = checkMoves();                                                      // when a players turn, show him no. of possible moves
     if (m == 0) {                                                                // if no moves left
       moves.hide();
+      ins1.hide();
+      ins2.hide();
       playername.html(`<span style="color: ${(player=='b'?'#B4395E':'#4D7D1E')}">
         ${(player=='b'?'PlayerOne':'PlayerTwo')}
       </span> wins!`);                                                           // player whose turn is over wins
